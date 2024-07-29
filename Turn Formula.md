@@ -40,16 +40,14 @@ $$
 x = lock(a - \text{turn speed})
 $$
 
-$$
-\text{current rotation} = \text{if $x \lt b$, then $b$; otherwise $x$}
-$$
-
 otherwise
 
 $$
 x = lock(a + \text{turn speed})
 $$
 
+Then define the current rotation by snapping the angle.
+
 $$
-\text{current rotation} = \text{if $x \gt b$, then $b$; otherwise $x$}
+\text{current rotation} = \text{if $x \gt b - (\text{turn speed})$ and $x \lt b + (\text{turn speed})$ then $b$; otherwise $x$}
 $$
