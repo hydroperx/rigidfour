@@ -26,8 +26,8 @@ if (a != b) {
     // Rotate either clockwise or counterclockwise for the
     // shortest route.
 
-    let ab = a - b; /* clockwise */
-    let ba = b - a; /* counterclockwise */
+    let ab = a - b; /* counterclockwise */
+    let ba = b - a; /* clockwise */
 
     // For the lower delta, add 360.
     if (Math.min(ab, ba) == ab) {
@@ -38,14 +38,14 @@ if (a != b) {
 
     // Rotate
     if (ab < ba) {
-        // clockwise
-        a += TURN_SPEED;
-        a = a > b ? b : a;
-    } else {
         // counterclockwise
         a -= TURN_SPEED;
         a = lock360Degrees(a);
         a = a < b ? b : a;
+    } else {
+        // clockwise
+        a += TURN_SPEED;
+        a = a > b ? b : a;
     }
 
     player.setAngle(a);
@@ -71,5 +71,13 @@ if (movingNorth) {
     player_vars.get("TargetRotation").setNumber(WEST_ROTATION);
 } else if (movingEast) {
     player_vars.get("TargetRotation").setNumber(EAST_ROTATION);
+}
+
+// Inertia
+if (!(movingNorth || movingSouth || movingWest || movingEast)) {
+    if ([NORTH_ROTATION, SOUTH_ROTATION, WEST_ROTATION, EAST_ROTATION].indexOf(b) == -1  && b != 0) {
+        b -= 45;
+        player_vars.get("TargetRotation").setNumber(b);
+    }
 }
 ```
