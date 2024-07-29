@@ -2,6 +2,8 @@
 
 ## 29-07-2024 GDevelop
 
+https://github.com/hydroperfox/rigidfourdemogdevelop
+
 Bug: force not working correctly.
 
 ```js
@@ -106,6 +108,8 @@ function toRadians(a) {
 ```
 
 ## 29-07-2024 Construct 3
+
+https://github.com/hydroperfox/rigidfourdemoc3
 
 Bug: force not working correctly.
 
