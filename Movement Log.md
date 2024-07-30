@@ -4,7 +4,7 @@
 
 https://github.com/hydroperfox/rigidfourdemogdevelop
 
-Bug: force not working correctly.
+Thought: I would like that the car would drift 360 degrees by rotating itself to point to the circunference's center.
 
 ```js
 const NORTH_ROTATION = 0;
@@ -16,8 +16,9 @@ const SOUTHEAST_ROTATION = 135;
 const WEST_ROTATION = 270;
 const EAST_ROTATION = 90;
 const TURN_SPEED = 5;
-const MOVE_SPEED = 7;
-const MAX_SPEED = 10;
+const MOVE_SPEED = 300;
+const MAX_SPEED = 500;
+const DECEL = 100;
 
 const player = objects[0];
 const player_vars = player.getVariables();
@@ -81,26 +82,42 @@ function lock360Degrees(a) {
     return a % 360;
 }
 
-const force = player.getAverageForce();
-force.setMultiplier(0.001);
-force.setLength(0.001);
+/** @type {gdjs.Physics2RuntimeBehavior} */
+const physicsBehavior = player.getBehavior("Physics2");
+
+let vx = 0, vy = 0;
 
 // Moving
 if (moving) {
-    const b_radians = toRadians(b);
-    let vx = Math.sin(b_radians) * MOVE_SPEED;
-    let vy = -Math.cos(b_radians) * MOVE_SPEED;
-    player.addForce(vx, vy);
+    const a_radians = toRadians(a);
+    vx = Math.sin(a_radians) * MOVE_SPEED;
+    vy = -Math.cos(a_radians) * MOVE_SPEED;
+    physicsBehavior.applyForce(vx, vy, player.getX(), player.getY());
 }
 
-// Clamp speed
-const forceX = force.getX();
-const forceY = force.getY();
-force.setX(forceX < -MAX_SPEED ? -MAX_SPEED : forceX > +MAX_SPEED ? +MAX_SPEED : forceX);
-force.setY(forceY < -MAX_SPEED ? -MAX_SPEED : forceY > +MAX_SPEED ? +MAX_SPEED : forceY);
+vx = physicsBehavior.getLinearVelocityX();
+vy = physicsBehavior.getLinearVelocityY();
 
-// Update force
-player.updateForces();
+// Deceleration
+if (vx < -MOVE_SPEED && !movingWest) {
+    vx -= vx / DECEL;
+}
+if (vx > +MOVE_SPEED && !movingEast) {
+    vx -= vx / DECEL;
+}
+if (vy < -MOVE_SPEED && !movingNorth) {
+    vy -= vy / DECEL;
+}
+if (vy > +MOVE_SPEED && !movingSouth) {
+    vy -= vy / DECEL;
+}
+
+// Clamp linear velocity
+vx = vx < -MAX_SPEED ? -MAX_SPEED : vx > +MAX_SPEED ? +MAX_SPEED : vx;
+vy = vy < -MAX_SPEED ? -MAX_SPEED : vy > +MAX_SPEED ? +MAX_SPEED : vy;
+
+physicsBehavior.setLinearVelocityX(vx);
+physicsBehavior.setLinearVelocityY(vy);
 
 function toRadians(a) {
     return a * Math.PI / 180;
